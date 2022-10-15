@@ -1,0 +1,2 @@
+class CapacityException(Exception):
+    pass
