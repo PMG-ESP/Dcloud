@@ -3,6 +3,9 @@ import os
 import hashlib
 import pathlib
 from cryptFile import CryptFile
+from datetime import datetime, date
+
+import logging
 
 
 
@@ -13,8 +16,17 @@ class Splitting():
         self.is_folder = is_folder
         self.filename = name #nom du fichier pour le split. omettre pour le reassemble 
         self.nb_splits = nb_splits #nombre de filepart à distribuer sur le réseau
+
+        new_folder = r'.\fileparts' #Dossier pour stocker les shards et manifests
+        if not os.path.exists(new_folder):
+            os.makedirs(new_folder)
+        new_folder = r'.\manifest'
+        if not os.path.exists(new_folder):
+            os.makedirs(new_folder)
+
         self.file_part_folder = pathlib.Path("fileParts/")
         
+
         self.BUFFER_SIZE = 4096 #taille du buffer
 
 
@@ -85,13 +97,26 @@ class Splitting():
         finally:
             file.close()
 
-        #creation du fichier manifest            
+        #Creation de l'historique 
+
+        now = datetime.now()
+        today = date.today()
+        current_time = now.strftime("%H:%M:%S")
+        date_string = str(today) + ' ' + str(current_time)
+        history_file = "History.txt"
+        infos = "[UPLOAD] " + date_string + "  "  +self.file_info["filename"] + '-->'+ self.file_info["filehash"] + '\n'
+        with open(history_file,"a") as h:
+            h.write(infos)
+
+        #creation du fichier manifest  
+                  
         manifest_name = self.file_info["filehash"]
         os.path.join("manifest",manifest_name)
         manifest = pathlib.Path("manifest/")
         file = open(manifest / manifest_name,"wb")
         pickle.dump(self.file_info,file)
         file.close()
+        return self.file_info
 
     @staticmethod
     def dirTree(root, path):
@@ -107,7 +132,7 @@ class Splitting():
         except Exception as e:
             print(f"Erreur lors de la recuperation du hash: {e}")
         finally:
-            unpickle.close()
+            unpickle.close() 
         os.path.basename(file_info["filename"])
         
         with open(file_info["filename"],"wb") as file:
@@ -127,6 +152,14 @@ class Splitting():
                         file.write(temp_data)
                     i+=1
                 os.remove(part_decrypted)
+        now = datetime.now()
+        today = date.today()
+        current_time = now.strftime("%H:%M:%S")
+        date_string = str(today) + ' ' + str(current_time)
+        history_file = "History.txt"
+        infos = "[DOWNLOAD] " + date_string + "  "  +file_info["filehash"] + '-->'+ file_info["filename"] + '\n'
+        with open(history_file,"a") as h:
+            h.write(infos)
 
             
 #####TEST

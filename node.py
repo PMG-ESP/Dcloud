@@ -11,11 +11,10 @@ class Node:
         self.zone = zone 
         self.capacity=capacity #espace de stockage disponible
         self.id = zone + str(uuid.uuid1()) #identifiant unique
+        print(f"ID du noeud: {self.id}")
         new_folder = r'.\CloudFiles' #Dossier pour stocker les shards et manifests
         if not os.path.exists(new_folder):
             os.makedirs(new_folder)
-
-
         
     #verifier si la capacité est suffisante
     def checkCapacity(self,required_capacity):
