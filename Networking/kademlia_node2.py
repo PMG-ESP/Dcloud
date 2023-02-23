@@ -1,8 +1,5 @@
 import logging
 import asyncio
-import sys
-from kademlia.crawling import NodeSpiderCrawl
-
 from kademlia.network import Server
 
 # if len(sys.argv) != 5:
@@ -24,7 +21,6 @@ async def run():
         await server.listen(8470)
         bootstrap_node = ('127.0.0.1', 8468)
         await server.bootstrap([bootstrap_node])
-        nearest = server.protocol.router.find_neighbors(server.node, server.alpha)
         #spider = NodeSpiderCrawl(server.protocol,server.node,nearest,server.ksize,server.alpha)
         print("******************finding******************")
         print(server.bootstrappable_neighbors())
